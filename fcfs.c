@@ -2,29 +2,42 @@
 
 int main() {
     int n, i;
-    int bt[10], wt[10], tat[10];
+    int at[10], bt[10], wt[10], tat[10], ct[10];
+
     float avg_wt = 0, avg_tat = 0;
 
     printf("Enter number of processes: ");
     scanf("%d", &n);
 
-    printf("Enter burst time of each process:\n");
-    for (i = 0; i < n; i++) {
-        printf("Process %d: ", i + 1);
+    // Input
+    for(i = 0; i < n; i++) {
+        printf("\nProcess %d\n", i+1);
+
+        printf("Arrival Time: ");
+        scanf("%d", &at[i]);
+
+        printf("Burst Time: ");
         scanf("%d", &bt[i]);
     }
 
-    // Waiting time for first process is 0
-    wt[0] = 0;
+    // First process
+    ct[0] = at[0] + bt[0];
+    tat[0] = ct[0] - at[0];
+    wt[0] = tat[0] - bt[0];
 
-    // Calculate waiting time
-    for (i = 1; i < n; i++) {
-        wt[i] = wt[i-1] + bt[i-1];
-    }
+    // Remaining processes
+    for(i = 1; i < n; i++) {
 
-    // Calculate turnaround time
-    for (i = 0; i < n; i++) {
-        tat[i] = wt[i] + bt[i];
+        // If CPU is idle
+        if(ct[i-1] < at[i]) {
+            ct[i] = at[i] + bt[i];
+        } else {
+            ct[i] = ct[i-1] + bt[i];
+        }
+
+        tat[i] = ct[i] - at[i];
+        wt[i] = tat[i] - bt[i];
+
         avg_wt += wt[i];
         avg_tat += tat[i];
     }
@@ -32,13 +45,16 @@ int main() {
     avg_wt /= n;
     avg_tat /= n;
 
-    printf("\nProcess\tBurst Time\tWaiting Time\tTurnaround Time\n");
-    for (i = 0; i < n; i++) {
-        printf("P%d\t\t%d\t\t%d\t\t%d\n", i + 1, bt[i], wt[i], tat[i]);
+    // Output
+    printf("\nP\tAT\tBT\tCT\tTAT\tWT\n");
+
+    for(i = 0; i < n; i++) {
+        printf("P%d\t%d\t%d\t%d\t%d\t%d\n",
+               i+1, at[i], bt[i], ct[i], tat[i], wt[i]);
     }
 
-    printf("\nAverage Waiting Time = %.2f", avg_wt);
-    printf("\nAverage Turnaround Time = %.2f\n", avg_tat);
+    printf("\nAverage WT = %.2f", avg_wt);
+    printf("\nAverage TAT = %.2f\n", avg_tat);
 
     return 0;
 }
